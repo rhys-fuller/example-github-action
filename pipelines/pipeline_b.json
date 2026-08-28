@@ -1,0 +1,11 @@
+{
+    "name": "pipeline_b",
+    "properties": {
+        "description": "This is pipeline B",
+        "version": "1.0.0"
+    },
+    "using": [
+        { "name": "service_one_DEV", "version": "1.0.0" },
+        { "name": "service_two_DEV", "version": "1.0.0" }
+    ]
+}

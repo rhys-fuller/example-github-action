@@ -1,0 +1,48 @@
+name: Replace DEV with PRD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  replace-dev-with-prd:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if [ -z "${{ github.event.before }}" ] || [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            FILES=$(git show --pretty="" --name-only HEAD)
+          else
+            FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "$FILES" > changed_files.txt
+          cat changed_files.txt
+
+      - name: Replace DEV with PRD in changed files
+        run: python .github/scripts/replace_dev_with_prd.py changed_files.txt
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git add -A
+            git commit -m "chore: replace DEV with PRD in changed files [skip ci]"
+            git push
+          fi
