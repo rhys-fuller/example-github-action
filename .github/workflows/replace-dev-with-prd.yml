@@ -29,11 +29,13 @@ jobs:
           else
             FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           fi
-          echo "$FILES" > changed_files.txt
-          cat changed_files.txt
+          # exclude workflow/script files so the action never tries to modify itself
+          FILES=$(echo "$FILES" | grep -v '^\.github/')
+          echo "$FILES" > "$RUNNER_TEMP/changed_files.txt"
+          cat "$RUNNER_TEMP/changed_files.txt"
 
       - name: Replace DEV with PRD in changed files
-        run: python .github/scripts/replace_dev_with_prd.py changed_files.txt
+        run: python .github/scripts/replace_dev_with_prd.py "$RUNNER_TEMP/changed_files.txt"
 
       - name: Commit and push changes
         run: |
@@ -42,7 +44,7 @@ jobs:
           if git diff --quiet; then
             echo "No changes to commit."
           else
-            git add -A
+            git add --update
             git commit -m "chore: replace DEV with PRD in changed files [skip ci]"
             git push
           fi
