@@ -5,7 +5,7 @@
         "version": "1.0.0"
     },
     "using": [
-        { "name": "service_three_DEV", "version": "1.0.0" },
-        { "name": "service_two_DEV", "version": "1.0.0" }
+        { "name": "service_three_PRD", "version": "1.0.0" },
+        { "name": "service_two_PRD", "version": "1.0.0" }
     ]
 }
